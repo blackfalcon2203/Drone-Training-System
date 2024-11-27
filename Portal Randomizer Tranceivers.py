@@ -1,6 +1,29 @@
 import network
 import espnow
 
+nextPortal = 0
+
+def bytetostringconverter():
+    global received_msg
+    global randomPortals
+    # decoding the incomming string back to a list:
+    # Decode bytes to a string
+    received_str = received_msg.decode()
+
+    # Remove the brackets and split by commas to get individual items
+    received_str = received_str.strip("[]")  # Remove the square brackets
+    randomPortals = [int(x.strip()) for x in received_str.split(",")]  # Convert each item to an integer
+
+    print(randomPortals)  # Output: [1, 2, 3, 4, 5]
+
+# Function to say what portal is next
+def whatportalnext(randomPortals):
+    global nextPortal
+    for i in range(6):
+        if randomPortals[0] == i:
+            nextPortal = i
+
+
 # A WLAN interface must be active to send/recv
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
@@ -25,25 +48,35 @@ e.add_peer(Portal_5)
 e.add_peer(Portal_6)
 print("EspNow Setup complete :)")
 
-while True:
-    host, msg = e.recv()
-    if msg:
-        print(host, msg)
-        if msg == b'end':
+
+def racingcycle():
+    while True:
+        host, msg = e.recv()
+        if msg:
+            received_msg = msg
             break
 
+    # Send the remainder of the randomPortals list to the corresponding Portal MC
+    if nextPortal == 1:
+        e.send(Portal_1, str(randomPortals).encode())
+        print("Send to Portal 1")
+    elif nextPortal == 2:
+        e.send(Portal_2, str(randomPortals).encode())
+        print("Send to Portal 2")
+    elif nextPortal == 3:
+        e.send(Portal_3, str(randomPortals).encode())
+        print("Send to Portal 3")
+    elif nextPortal == 4:
+        e.send(Portal_4, str(randomPortals).encode())
+        print("Send to Portal 4")
+    elif nextPortal == 5:
+        e.send(Portal_5, str(randomPortals).encode())
+        print("Send to Portal 5")
+    elif nextPortal == 6:
+        e.send(Portal_6, str(randomPortals).encode())
+        print("Send to Portal 6")
+    elif nextPortal == 0:
+        e.send()
 
-
-
-# decoding the incomming string back to a list:
-# Example received message as bytes
-received_message = b"[1, 2, 3, 4]"
-
-# Decode bytes to a string
-received_str = received_message.decode()
-
-# Remove the brackets and split by commas to get individual items
-received_str = received_str.strip("[]")  # Remove the square brackets
-received_list = [int(x.strip()) for x in received_str.split(",")]  # Convert each item to an integer
-
-print(received_list)  # Output: [1, 2, 3, 4]
+    whatportalnext(randomPortals)
+    randomPortals.pop(0)
