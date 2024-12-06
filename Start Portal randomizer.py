@@ -29,6 +29,11 @@ e.add_peer(Portal_6)
 print('EspNOW Set up :)')
 
 e.send(Portal_1, 'Starting....')
+e.send(Portal_2, 'Starting....')
+e.send(Portal_3, 'Starting....')
+e.send(Portal_4, 'Starting....')
+e.send(Portal_5, 'Starting....')
+e.send(Portal_6, 'Starting....')
 
 # List of 6 portals
 portals = [1, 2, 3, 4, 5, 6]
