@@ -1,5 +1,9 @@
 import network
 import espnow
+from hcsr04 import HCSR04
+
+#set the pins for the ultrasonic sensor
+ultrasone_sensor = HCSR04(trigger_pin=5, echo_pin=18, echo_timeout_us=10000)
 
 nextPortal = 0
 
@@ -29,7 +33,7 @@ sta = network.WLAN(network.STA_IF)
 sta.active(True)
 print("WLAN Setup Complete :)")
 
-# Setup the EspNow network (Define Peers)
+# Set up the EspNow network (Define Peers)
 e = espnow.ESPNow()
 e.active(True)
 StartPort = b'\x34\x5F\x45\xAA\x25\x1C'
@@ -50,11 +54,21 @@ print("EspNow Setup complete :)")
 
 
 def racingcycle():
+    global received_msg
     while True:
         host, msg = e.recv()
         if msg:
             received_msg = msg
             break
+
+    while True:
+        distance = ultrasone_sensor.distance_cm()
+        if distance < 30:
+            break
+
+    # readout the first number from the list and discarding it after
+    whatportalnext(randomPortals)
+    randomPortals.pop(0)
 
     # Send the remainder of the randomPortals list to the corresponding Portal MC
     if nextPortal == 1:
@@ -78,5 +92,7 @@ def racingcycle():
     elif nextPortal == 0:
         e.send()
 
-    whatportalnext(randomPortals)
-    randomPortals.pop(0)
+    print('Done!!!!!')
+
+while True:
+    racingcycle()
