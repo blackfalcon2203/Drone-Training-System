@@ -1,6 +1,22 @@
 import random
 import network
 import espnow
+import machine
+import neopixel
+import time
+
+p = machine.Pin(4)
+n = neopixel.NeoPixel(p, 60)
+
+while True:
+    for i in range(60):
+        n[i] = (0, 0, 255)
+    n.write()
+    time.sleep(1)
+    for i in range(60):
+        n[i] = (255, 0, 0)
+    n.write()
+    time.sleep(1)
 
 
 # Setup for the EspNow Protocol
@@ -17,15 +33,11 @@ Portal_1 = b'\x34\x5F\x45\xAA\x98\xF4'
 Portal_2 = b'\xD4\x8C\x49\x57\x4A\x3C'
 Portal_3 = b'\x34\x5F\x45\xAA\xA3\xE4'
 Portal_4 = b'\xD4\x8C\x49\x58\x4E\x58'
-Portal_5 = b'\xD4\x8C\x49\x57\x0D\x78'
-Portal_6 = b'\xD4\x8C\x49\x57\x15\xAC'
 e.add_peer(StartPort)
 e.add_peer(Portal_1)
 e.add_peer(Portal_2)
 e.add_peer(Portal_3)
 e.add_peer(Portal_4)
-e.add_peer(Portal_5)
-e.add_peer(Portal_6)
 print('EspNOW Set up :)')
 
 e.send(Portal_1, 'Starting....')
@@ -35,8 +47,8 @@ e.send(Portal_4, 'Starting....')
 e.send(Portal_5, 'Starting....')
 e.send(Portal_6, 'Starting....')
 
-# List of 6 portals
-portals = [1, 2, 3, 4, 5, 6]
+# List of 4 portals
+portals = [1, 2, 3, 4]
 # Make a List of the random sequence of portals
 randomPortals = []
 # Make a var with the next portal in it
@@ -45,7 +57,7 @@ nextPortal = 0
 # Function to say what portal is next
 def whatportalnext(randomPortals):
     global nextPortal
-    for i in range(6):
+    for i in range(4):
         if randomPortals[0] == i:
             nextPortal = i
 
@@ -81,12 +93,6 @@ def racingcycle():
     elif nextPortal == 4:
         e.send(Portal_4, str(portals).encode())
         print("Send to Portal 4")
-    elif nextPortal == 5:
-        e.send(Portal_5, str(portals).encode())
-        print("Send to Portal 5")
-    elif nextPortal == 6:
-        e.send(Portal_6, str(portals).encode())
-        print("Send to Portal 6")
 
     # Listen for a response back when the full sequence is complete to reset the program
     while True:
